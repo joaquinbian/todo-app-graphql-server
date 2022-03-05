@@ -4,6 +4,28 @@ export const typeDefs = gql`
     getTaskList: [TaskList]
   }
 
+  type Mutation {
+    signUp(input: SignUpInput!): AuthUser!
+    signIn(input: SignInInput!): AuthUser!
+  }
+
+  "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"
+  input SignUpInput {
+    email: String!
+    name: String!
+    password: String!
+    avatar: String
+  }
+  input SignInInput {
+    email: String!
+    password: String!
+  }
+
+  type AuthUser {
+    user: User!
+    token: String!
+  }
+
   type User {
     id: ID!
     name: String!

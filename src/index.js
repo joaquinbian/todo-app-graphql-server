@@ -1,15 +1,16 @@
 import { gql, ApolloServer } from "apollo-server";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
+import { resolvers } from "./graphql/resolvers.js";
 import { typeDefs } from "./graphql/schema.js";
 
 dotenv.config();
 
-const resolvers = {
-  Query: {
-    getTaskList: () => null,
-  },
-};
+// const resolvers = {
+//   Query: {
+//     getTaskList: () => null,
+//   },
+// };
 
 const startApi = async () => {
   try {
