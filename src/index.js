@@ -25,8 +25,6 @@ const typeDefs = gql`
   }
 `;
 
-const server = new ApolloServer({ typeDefs, mocks });
-
 const startApi = async () => {
   try {
     const client = new MongoClient(process.env.DB_URI, {
@@ -38,6 +36,7 @@ const startApi = async () => {
 
     const db = client.db(process.env.DB_NAME);
 
+    const server = new ApolloServer({ typeDefs, mocks });
     server.listen().then(({ url }) => {
       console.log(`server listen at ${url}`);
     });
