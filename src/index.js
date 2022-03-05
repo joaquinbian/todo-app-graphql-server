@@ -4,6 +4,20 @@ import { MongoClient } from "mongodb";
 
 dotenv.config();
 
+const books = [
+  { title: "Harry Potter", author: "Harry Maguire" },
+  { title: "Harry Potter", author: "Harry Maguire" },
+];
+
+const resolvers = {
+  Query: {
+    books: (parent, args, context) => {
+      console.log({ context: context.db });
+      return books;
+    },
+  },
+};
+
 const mocks = {
   Query: () => ({
     books: () => [...new Array(6)],
@@ -36,7 +50,13 @@ const startApi = async () => {
 
     const db = client.db(process.env.DB_NAME);
 
-    const server = new ApolloServer({ typeDefs, mocks });
+    const context = {
+      db,
+    };
+
+    //en el context le pasamos la db, el context es el 3 parametro de los resolvers
+    //por eso desde los resolvers podemos acceeder a la bd
+    const server = new ApolloServer({ typeDefs, context, resolvers });
     server.listen().then(({ url }) => {
       console.log(`server listen at ${url}`);
     });
