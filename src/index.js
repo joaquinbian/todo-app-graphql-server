@@ -1,43 +1,15 @@
 import { gql, ApolloServer } from "apollo-server";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
+import { typeDefs } from "./graphql/schema.js";
 
 dotenv.config();
 
-const books = [
-  { title: "Harry Potter", author: "Harry Maguire" },
-  { title: "Harry Potter", author: "Harry Maguire" },
-];
-
 const resolvers = {
   Query: {
-    books: (parent, args, context) => {
-      console.log({ context: context.db });
-      return books;
-    },
+    getTaskList: () => null,
   },
 };
-
-const mocks = {
-  Query: () => ({
-    books: () => [...new Array(6)],
-  }),
-  Book: () => ({
-    title: "Harry Potter",
-    author: "Harry Maguire",
-  }),
-};
-
-const typeDefs = gql`
-  type Book {
-    title: String!
-    author: String!
-  }
-
-  type Query {
-    books: [Book]
-  }
-`;
 
 const startApi = async () => {
   try {
