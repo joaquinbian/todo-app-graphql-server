@@ -1,4 +1,8 @@
 import { gql, ApolloServer } from "apollo-server";
+import dotenv from "dotenv";
+import { MongoClient } from "mongodb";
+
+dotenv.config();
 
 const mocks = {
   Query: () => ({
@@ -23,6 +27,23 @@ const typeDefs = gql`
 
 const server = new ApolloServer({ typeDefs, mocks });
 
-server.listen().then(({ url }) => {
-  console.log(`server listen at ${url}`);
-});
+const startApi = async () => {
+  try {
+    const client = new MongoClient(process.env.DB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    await client.connect();
+
+    const db = client.db(process.env.DB_NAME);
+
+    server.listen().then(({ url }) => {
+      console.log(`server listen at ${url}`);
+    });
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+startApi();
