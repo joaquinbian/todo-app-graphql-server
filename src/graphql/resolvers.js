@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { v4 as uuid } from "uuid";
+import { getToken } from "../services/token.js";
 
 export const resolvers = {
   Query: {
@@ -39,7 +39,7 @@ export const resolvers = {
         message: "user created!",
         user: {
           user,
-          token: "a el token 8)",
+          token: getToken(user),
         },
       };
     },
@@ -76,7 +76,7 @@ export const resolvers = {
         message: "user logged!",
         user: {
           user,
-          token: "a el token 8)",
+          token: getToken(user),
         },
       };
     },
