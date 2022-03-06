@@ -19,7 +19,6 @@ export const resolvers = {
         .collection("Users")
         .findOne({ email: input.email });
 
-      console.log({ userExist });
       if (userExist) {
         return {
           code: 400,
@@ -44,12 +43,52 @@ export const resolvers = {
         },
       };
     },
+    signIn: async (_, args, context) => {
+      const { input } = args;
+      const { db } = context;
+
+      const user = await db.collection("Users").findOne({ email: input.email });
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "invalid credentials",
+          user: null,
+        };
+      }
+
+      //le pasamos la contraseña del login y la de la bd hasheada
+      const isPasswordCorrect = bcrypt.compareSync(
+        input.password,
+        user.password
+      );
+      if (!isPasswordCorrect) {
+        return {
+          code: 400,
+          success: false,
+          message: "invalid credentials",
+          user: null,
+        };
+      }
+      return {
+        code: 200,
+        success: true,
+        message: "user logged!",
+        user: {
+          user,
+          token: "a el token 8)",
+        },
+      };
+    },
   },
   User: {
     id: (parent) => {
       //como en la base de datos el id esta en _id, lo devolvemos asi
       //para que matchee con el shcema,
-      return parent._id;
+      const { _id, id } = parent;
+      //hacemos esto porque aveces el id viene directamente de la app
+      //y en ese caso no está como _id
+      return _id || id;
     },
   },
 };

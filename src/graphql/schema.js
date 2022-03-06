@@ -5,8 +5,8 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    signUp(input: SignUpInput!): SignUpResponse!
-    signIn(input: SignInInput!): AuthUser!
+    signUp(input: SignUpInput!): SignUserResponse!
+    signIn(input: SignInInput!): SignUserResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"
@@ -22,7 +22,7 @@ export const typeDefs = gql`
   }
 
   "type de la respuesta que devuelve cuando nos registramos"
-  type SignUpResponse {
+  type SignUserResponse {
     code: Int!
     success: Boolean!
     message: String!
