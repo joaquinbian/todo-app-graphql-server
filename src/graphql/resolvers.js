@@ -1,10 +1,23 @@
 import bcrypt from "bcryptjs";
 import { getToken } from "../services/token.js";
 import ObjectID from "bson-objectid";
+import { AuthenticationError } from "apollo-server";
 
 export const resolvers = {
   Query: {
-    getTaskList: () => null,
+    getTaskList: async (_, __, context) => {
+      const { user, db } = context;
+      if (!user) throw new Error("Authentication error: please sign in");
+      console.log({ user });
+      const taskList = await db
+        .collection("TaskList")
+        .find({ users: user._id.toString() })
+        .toArray(); //para pasarlo a array
+      // console.log({ taskList });
+
+      if (taskList.length === 0) return null;
+      return taskList;
+    },
   },
   Mutation: {
     signUp: async (_, args, context) => {
