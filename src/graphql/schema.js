@@ -8,6 +8,7 @@ export const typeDefs = gql`
     signUp(input: SignUpInput!): SignUserResponse!
     signIn(input: SignInInput!): SignUserResponse!
     createTaskList(title: String!): CreateTaskListResponse!
+    updateTaskList(id: ID!, title: String!): UpdateTaskListResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"
@@ -31,6 +32,13 @@ export const typeDefs = gql`
   }
 
   type CreateTaskListResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    taskList: TaskList
+  }
+
+  type UpdateTaskListResponse {
     code: Int!
     success: Boolean!
     message: String!

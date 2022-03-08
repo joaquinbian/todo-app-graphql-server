@@ -132,6 +132,42 @@ export const resolvers = {
         taskList,
       };
     },
+    updateTaskList: async (_, args, context) => {
+      const { id, title } = args;
+      const { db, user } = context;
+
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error, please sign in",
+          taskList: null,
+        };
+      }
+
+      if (!title || !id) {
+        return {
+          code: 400,
+          success: false,
+          message: "Not enough data! You must provide id and title!",
+          taskList: null,
+        };
+      }
+
+      const taskListUpdated = await db
+        .collection("TaskList")
+        .updateOne({ _id: ObjectID(id) }, { $set: { title: title } });
+      // console.log({ taskListUpdated });
+      //aca  hacer una queryque te busque la tarea por el id, que ya lo tenemos
+      //pero buscar si hay una mejor forma
+
+      return {
+        code: 200,
+        success: true,
+        message: "TaskList updaeted",
+        taskList: taskListUpdated,
+      };
+    },
   },
   User: {
     id: (parent) => {
