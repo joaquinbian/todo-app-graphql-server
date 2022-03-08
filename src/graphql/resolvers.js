@@ -154,9 +154,11 @@ export const resolvers = {
         };
       }
 
-      const taskListUpdated = await db
-        .collection("TaskList")
-        .updateOne({ _id: ObjectID(id) }, { $set: { title: title } });
+      const taskListUpdated = await db.collection("TaskList").findOneAndUpdate(
+        { _id: ObjectID(id) },
+        { $set: { title } }, //si ponemos directamente {title} reemplaza todo el documento
+        { returnDocument: "after" } //lo retorna despues de ser actualizado
+      );
       // console.log({ taskListUpdated });
       //aca  hacer una queryque te busque la tarea por el id, que ya lo tenemos
       //pero buscar si hay una mejor forma
@@ -165,7 +167,7 @@ export const resolvers = {
         code: 200,
         success: true,
         message: "TaskList updaeted",
-        taskList: taskListUpdated,
+        taskList: taskListUpdated.value,
       };
     },
   },
@@ -182,6 +184,7 @@ export const resolvers = {
   TaskList: {
     id: (parent) => {
       const { _id, id } = parent;
+      // console.log({ parent }, "parent en taskList id");
       return _id || id;
     },
     progress: () => 0,
