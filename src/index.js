@@ -28,13 +28,13 @@ const startApi = async () => {
     //por eso desde los resolvers podemos acceeder a la bd
     const server = new ApolloServer({
       typeDefs,
-      context: ({ req }) => {
-        console.log({ tok: req.headers.authorization });
-        const user = getUser({ token: req.headers.authorization, db });
+      context: async ({ req }) => {
+        console.log({ tokenContext: req.headers.authorization });
+        const user = await getUser({ token: req.headers.authorization, db });
         // console.log({ user });
         return {
           db,
-          // user,
+          user,
         };
       },
       resolvers,

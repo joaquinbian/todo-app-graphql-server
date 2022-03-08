@@ -13,8 +13,6 @@ export const getUser = async ({ token, db }) => {
   const user = await db
     .collection("Users")
     .findOne({ _id: ObjectID(tokenId.id) });
-  console.log({ user });
-  return {
-    name: "pepe",
-  };
+  //   console.log({ user });
+  return user;
 };
