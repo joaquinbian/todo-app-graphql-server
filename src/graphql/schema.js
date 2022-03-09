@@ -11,6 +11,10 @@ export const typeDefs = gql`
     createTaskList(title: String!): CUTaskListResponse!
     updateTaskList(id: ID!, title: String!): CUTaskListResponse!
     deleteTaskList(id: ID!): DeleteTaskListResponse!
+    inviteUserToTaskList(
+      taskListId: ID!
+      userInvitedId: ID!
+    ): CUTaskListResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"

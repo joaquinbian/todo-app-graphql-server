@@ -220,6 +220,85 @@ export const resolvers = {
         taskList: null,
       };
     },
+    inviteUserToTaskList: async (_, args, context) => {
+      const { userInvitedId, taskListId } = args;
+      const { db, user } = context;
+
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error, please sign in",
+          taskList: null,
+        };
+      }
+      if (!userInvitedId) {
+        return {
+          code: 400,
+          success: false,
+          message: "You must specify an user to invite!",
+          taskList: null,
+        };
+      }
+
+      const taskListExist = await db
+        .collection("TaskList")
+        .findOne({ _id: ObjectID(taskListId) });
+      if (!taskListId) {
+        return {
+          code: 400,
+          success: false,
+          message: "TaskList was not found!",
+          taskList: null,
+        };
+      }
+
+      const userInvited = await db
+        .collection("Users")
+        .findOne({ _id: ObjectID(userInvitedId) });
+
+      if (!userInvited) {
+        return {
+          code: 400,
+          success: false,
+          message: "The user you tried to invite was not found!",
+          taskList: null,
+        };
+      }
+
+      // console.log({ userInvited });
+
+      //buscamos si el usuario ya esta en la lista
+      //buscando la lista en la bd y si en users esta el id del usuario que quremos agregar
+      const isUserInvited = await db
+        .collection("TaskList")
+        .findOne({ _id: ObjectID(taskListId), users: userInvitedId });
+      // console.log({ isUserInvited });
+      if (isUserInvited) {
+        return {
+          code: 400,
+          success: false,
+          message: "The user you tried to invite is already added!",
+          taskList: null,
+        };
+      }
+
+      const taskListUpdated = await db
+        .collection("TaskList")
+        .findOneAndUpdate(
+          { _id: ObjectID(taskListId) },
+          { $push: { users: userInvitedId } },
+          { returnDocument: "after" }
+        );
+
+      console.log({ taskListUpdated });
+      return {
+        code: 200,
+        success: true,
+        message: "User added correctly!",
+        taskList: taskListUpdated.value,
+      };
+    },
   },
   User: {
     id: (parent) => {
