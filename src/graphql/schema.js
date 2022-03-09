@@ -2,13 +2,15 @@ import { gql } from "apollo-server";
 export const typeDefs = gql`
   type Query {
     getTaskList: [TaskList]
+    getTaskListById(id: ID!): TaskList
   }
 
   type Mutation {
     signUp(input: SignUpInput!): SignUserResponse!
     signIn(input: SignInInput!): SignUserResponse!
-    createTaskList(title: String!): CreateTaskListResponse!
-    updateTaskList(id: ID!, title: String!): UpdateTaskListResponse!
+    createTaskList(title: String!): CUTaskListResponse!
+    updateTaskList(id: ID!, title: String!): CUTaskListResponse!
+    deleteTaskList(id: ID!): DeleteTaskListResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"
@@ -31,14 +33,15 @@ export const typeDefs = gql`
     user: AuthUser
   }
 
-  type CreateTaskListResponse {
+  "Create Update TaskList Responses"
+  type CUTaskListResponse {
     code: Int!
     success: Boolean!
     message: String!
     taskList: TaskList
   }
 
-  type UpdateTaskListResponse {
+  type DeleteTaskListResponse {
     code: Int!
     success: Boolean!
     message: String!

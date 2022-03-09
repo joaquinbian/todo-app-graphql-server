@@ -18,6 +18,20 @@ export const resolvers = {
       if (taskList.length === 0) return null;
       return taskList;
     },
+    getTaskListById: async (_, args, context) => {
+      const { id } = args;
+      const { db, user } = context;
+
+      if (!user) throw new Error("Authentication error: please sign in");
+
+      if (!id) throw new Error("You must provide an id");
+
+      const taskList = await db
+        .collection("TaskList")
+        .findOne({ _id: ObjectID(id) });
+      // console.log({ taskList });
+      return taskList;
+    },
   },
   Mutation: {
     signUp: async (_, args, context) => {
@@ -132,6 +146,7 @@ export const resolvers = {
         taskList,
       };
     },
+
     updateTaskList: async (_, args, context) => {
       const { id, title } = args;
       const { db, user } = context;
@@ -168,6 +183,41 @@ export const resolvers = {
         success: true,
         message: "TaskList updaeted",
         taskList: taskListUpdated.value,
+      };
+    },
+    deleteTaskList: async (_, args, context) => {
+      const { id } = args;
+      const { db, user } = context;
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error, please sign in",
+          taskList: null,
+        };
+      }
+
+      //solo los participantes de esta tasklist deberian poder borrar el tasklist
+
+      if (!id) {
+        return {
+          code: 400,
+          success: false,
+          message: "You must provide an id",
+          taskList: null,
+        };
+      }
+
+      const taskListDelete = await db
+        .collection("TaskList")
+        .findOneAndDelete({ _id: ObjectID(id) });
+
+      console.log({ taskListDelete });
+      return {
+        code: 200,
+        success: true,
+        message: `task list ${id} deleted`,
+        taskList: null,
       };
     },
   },
