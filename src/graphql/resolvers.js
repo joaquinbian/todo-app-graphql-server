@@ -304,8 +304,6 @@ export const resolvers = {
       const { content, taskListId } = args;
       const { db, user } = context;
 
-      console.log("ME EJECUTO CREAETE TOODO");
-
       if (!user) {
         return {
           code: 400,
@@ -356,6 +354,52 @@ export const resolvers = {
         success: true,
         message: "ToDo added!",
         toDo,
+      };
+    },
+    updateToDo: async (_, args, context) => {
+      const { db, user } = context;
+      const { id, ...data } = args;
+
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error, please sign in",
+          taskList: null,
+        };
+      }
+
+      console.log({ args });
+
+      const toDoExist = await db
+        .collection("ToDo")
+        .findOne({ _id: ObjectID(id) });
+
+      if (!toDoExist) {
+        return {
+          code: 400,
+          success: false,
+          message: "toDo you try to update was not found",
+          taskList: null,
+        };
+      }
+
+      //en data solo guardamos content e isCompleted
+      const toDo = await db
+        .collection("ToDo")
+        .findOneAndUpdate(
+          { _id: ObjectID(id) },
+          { $set: data },
+          { returnDocument: "after" }
+        );
+
+      // console.log({ toDo });
+
+      return {
+        code: 200,
+        success: true,
+        message: "toDo updated!",
+        toDo: toDo.value,
       };
     },
   },
