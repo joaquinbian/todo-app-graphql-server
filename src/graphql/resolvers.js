@@ -245,7 +245,7 @@ export const resolvers = {
       const taskListExist = await db
         .collection("TaskList")
         .findOne({ _id: ObjectID(taskListId) });
-      if (!taskListId) {
+      if (!taskListExist) {
         return {
           code: 400,
           success: false,
@@ -344,7 +344,8 @@ export const resolvers = {
       };
 
       const result = await db.collection("ToDo").insertOne(newToDo);
-      console.log({ result });
+
+      // console.log({ result });
       const toDo = await db
         .collection("ToDo")
         .findOne({ _id: result.insertedId });
@@ -389,6 +390,19 @@ export const resolvers = {
         )
       );
       return users;
+    },
+    //como a los todos les pasamos el id del tasklist,
+    //para recuperarlos vamos a la bd de datos donde estan
+    //los todos y traemos todos los todos que esten
+    //asociados a esta Tasklist
+    toDos: async (parent, _, context) => {
+      const { db } = context;
+      const { _id } = parent;
+      const toDos = await db
+        .collection("ToDo")
+        .find({ taskListId: _id })
+        .toArray();
+      return toDos;
     },
   },
   ToDo: {
