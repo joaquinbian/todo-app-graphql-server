@@ -8,13 +8,15 @@ export const typeDefs = gql`
   type Mutation {
     signUp(input: SignUpInput!): SignUserResponse!
     signIn(input: SignInInput!): SignUserResponse!
-    createTaskList(title: String!): CUTaskListResponse!
-    updateTaskList(id: ID!, title: String!): CUTaskListResponse!
-    deleteTaskList(id: ID!): DeleteTaskListResponse!
+    createTaskList(title: String!): CUDTaskListResponse!
+    updateTaskList(id: ID!, title: String!): CUDTaskListResponse!
+    deleteTaskList(id: ID!): CUDTaskListResponse!
     inviteUserToTaskList(
       taskListId: ID!
       userInvitedId: ID!
-    ): CUTaskListResponse!
+    ): CUDTaskListResponse!
+
+    createToDo(content: String!, taskListId: ID!): ToDoResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"
@@ -37,19 +39,19 @@ export const typeDefs = gql`
     user: AuthUser
   }
 
-  "Create Update TaskList Responses"
-  type CUTaskListResponse {
+  "Create Update Delete TaskList Responses"
+  type CUDTaskListResponse {
     code: Int!
     success: Boolean!
     message: String!
     taskList: TaskList
   }
 
-  type DeleteTaskListResponse {
+  type ToDoResponse {
     code: Int!
     success: Boolean!
     message: String!
-    taskList: TaskList
+    toDo: ToDo
   }
 
   type AuthUser {

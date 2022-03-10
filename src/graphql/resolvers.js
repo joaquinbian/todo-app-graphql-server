@@ -221,6 +221,7 @@ export const resolvers = {
       };
     },
     inviteUserToTaskList: async (_, args, context) => {
+      //ver si puedo hacer esto con la menor cantidad de llamadas posibles
       const { userInvitedId, taskListId } = args;
       const { db, user } = context;
 
@@ -299,6 +300,63 @@ export const resolvers = {
         taskList: taskListUpdated.value,
       };
     },
+    createToDo: async (_, args, context) => {
+      const { content, taskListId } = args;
+      const { db, user } = context;
+
+      console.log("ME EJECUTO CREAETE TOODO");
+
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error. Please sign in",
+          taskList: null,
+        };
+      }
+
+      if (!content.length) {
+        return {
+          code: 400,
+          success: false,
+          message: "You can not create a empty to-do",
+          taskList: null,
+        };
+      }
+
+      const taskList = await db
+        .collection("TaskList")
+        .findOne({ _id: ObjectID(taskListId) });
+
+      if (!taskList) {
+        return {
+          code: 400,
+          success: false,
+          message: "The taskList where you tried to add a to-do was not found",
+          taskList: null,
+        };
+      }
+
+      const newToDo = {
+        content,
+        taskListId: ObjectID(taskListId), //lo haceoms aca esto pq es mas optimo para buscar dsp en el resolver
+        isCompleted: false,
+      };
+
+      const result = await db.collection("ToDo").insertOne(newToDo);
+      console.log({ result });
+      const toDo = await db
+        .collection("ToDo")
+        .findOne({ _id: result.insertedId });
+      console.log({ toDo });
+
+      return {
+        code: 200,
+        success: true,
+        message: "ToDo added!",
+        toDo,
+      };
+    },
   },
   User: {
     id: (parent) => {
@@ -331,6 +389,21 @@ export const resolvers = {
         )
       );
       return users;
+    },
+  },
+  ToDo: {
+    id: (parent) => {
+      const { id, _id } = parent;
+      return _id || id;
+    },
+    taskList: async (parent, _, context) => {
+      const { taskListId } = parent;
+      const { db } = context;
+      console.log({ parent });
+      const taskList = await db
+        .collection("TaskList")
+        .findOne({ _id: taskListId });
+      return taskList;
     },
   },
 };
