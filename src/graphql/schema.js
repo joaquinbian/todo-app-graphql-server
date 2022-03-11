@@ -18,6 +18,7 @@ export const typeDefs = gql`
 
     createToDo(content: String!, taskListId: ID!): ToDoResponse!
     updateToDo(id: ID!, content: String, isCompleted: Boolean): ToDoResponse!
+    deleteToDo(id: ID!): ToDoResponse!
   }
 
   "cuando tenemos muchos parametros para pasar, lo podemos hacer así para q sea mas legible"

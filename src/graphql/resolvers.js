@@ -402,6 +402,50 @@ export const resolvers = {
         toDo: toDo.value,
       };
     },
+
+    deleteToDo: async (_, args, context) => {
+      const { id } = args;
+      const { db, user } = context;
+
+      if (!user) {
+        return {
+          code: 400,
+          success: false,
+          message: "Authentication error, please sign in",
+          toDo: null,
+        };
+      }
+
+      if (!id) {
+        return {
+          code: 400,
+          success: false,
+          message: "you must provide an id",
+          toDo: null,
+        };
+      }
+
+      const existToDo = await db
+        .collection("ToDo")
+        .findOne({ _id: ObjectID(id) });
+      if (!existToDo) {
+        return {
+          code: 400,
+          success: false,
+          message: "toDo you want to delete was not found",
+          toDo: null,
+        };
+      }
+
+      await db.collection("ToDo").findOneAndDelete({ _id: ObjectID(id) });
+
+      return {
+        code: 200,
+        success: true,
+        message: "toDo deleted successfully",
+        toDo: null,
+      };
+    },
   },
   User: {
     id: (parent) => {
@@ -419,7 +463,19 @@ export const resolvers = {
       // console.log({ parent }, "parent en taskList id");
       return _id || id;
     },
-    progress: () => 0,
+    progress: async (parent, __, context) => {
+      const { _id } = parent; //el id de la tasklist en la bd para buscar las todo en la bd
+      const { db } = context;
+      const todos = await db
+        .collection("ToDo")
+        .find({ taskListId: _id })
+        .toArray();
+      const todosCompleted = todos.filter((todo) => todo.isCompleted);
+
+      if (todos.length === 0) return 0;
+
+      return (100 * todosCompleted.length) / todos.length;
+    },
 
     users: async (parent, _, context) => {
       const { db } = context;
