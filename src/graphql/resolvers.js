@@ -7,13 +7,16 @@ export const resolvers = {
   Query: {
     getTaskList: async (_, __, context) => {
       const { user, db } = context;
-      if (!user) throw new Error("Authentication error: please sign in");
+      if (!user)
+        throw new AuthenticationError("Authentication error: please sign in");
       console.log({ user });
       const taskList = await db
         .collection("TaskList")
         .find({ users: user._id.toString() })
         .toArray(); //para pasarlo a array
       // console.log({ taskList });
+
+      console.log("ENTRE ACA GET TASK LIST CON EL USER", user);
 
       if (taskList.length === 0) return null;
       return taskList;
@@ -47,6 +50,8 @@ export const resolvers = {
         .collection("Users")
         .findOne({ email: input.email });
 
+      console.log({ userExist, input });
+
       if (userExist) {
         return {
           code: 400,
@@ -55,7 +60,7 @@ export const resolvers = {
           user: null,
         };
       }
-
+      console.log({ input });
       const result = await db.collection("Users").insertOne(newUser);
       const user = await db
         .collection("Users")
@@ -74,30 +79,32 @@ export const resolvers = {
     signIn: async (_, args, context) => {
       const { input } = args;
       const { db } = context;
-
+      // try {
       const user = await db.collection("Users").findOne({ email: input.email });
-      if (!user) {
-        return {
-          code: 400,
-          success: false,
-          message: "invalid credentials",
-          user: null,
-        };
-      }
+      // if (!user) {
+      //   return {
+      //     code: 400,
+      //     success: false,
+      //     message: "invalid credentials",
+      //     user: null,
+      //   };
+      // }
 
       //le pasamos la contraseña del login y la de la bd hasheada
-      const isPasswordCorrect = bcrypt.compareSync(
-        input.password,
-        user.password
-      );
-      if (!isPasswordCorrect) {
-        return {
-          code: 400,
-          success: false,
-          message: "invalid credentials",
-          user: null,
-        };
+      const isPasswordCorrect =
+        user && bcrypt.compareSync(input.password, user.password);
+      if (!isPasswordCorrect || !user) {
+        throw new AuthenticationError("Invalid credentials");
       }
+
+      // if (!isPasswordCorrect) {
+      //   return {
+      //     code: 400,
+      //     success: false,
+      //     message: "invalid credentials",
+      //     user: null,
+      //   };
+      // }
       return {
         code: 200,
         success: true,
@@ -107,6 +114,16 @@ export const resolvers = {
           token: getToken(user),
         },
       };
+      // }
+      // catch (error) {
+      //   console.log({ error });
+      //   return {
+      //     code: error.extensions.response.status,
+      //     success: false,
+      //     message: error.extensions.response.body,
+      //     user: null,
+      //   };
+      // }
     },
     createTaskList: async (_, args, context) => {
       const { title } = args;
