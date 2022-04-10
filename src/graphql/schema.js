@@ -6,8 +6,8 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    signUp(input: SignUpInput!): SignUserResponse!
-    signIn(input: SignInInput!): SignUserResponse!
+    signUp(input: SignUpInput!): AuthResult!
+    signIn(input: SignInInput!): AuthResult!
     createTaskList(title: String!): CUDTaskListResponse!
     updateTaskList(id: ID!, title: String!): CUDTaskListResponse!
     deleteTaskList(id: ID!): CUDTaskListResponse!
@@ -33,14 +33,6 @@ export const typeDefs = gql`
     password: String!
   }
 
-  "type de la respuesta que devuelve cuando nos registramos"
-  type SignUserResponse {
-    code: Int!
-    success: Boolean!
-    message: String!
-    user: AuthUser
-  }
-
   "Create Update Delete TaskList Responses"
   type CUDTaskListResponse {
     code: Int!
@@ -59,6 +51,9 @@ export const typeDefs = gql`
   type AuthUser {
     user: User!
     token: String!
+  }
+  type AuthError {
+    message: String!
   }
 
   type User {
@@ -83,4 +78,6 @@ export const typeDefs = gql`
     isCompleted: Boolean!
     taskList: TaskList!
   }
+
+  union AuthResult = AuthUser | AuthError
 `;

@@ -54,10 +54,7 @@ export const resolvers = {
 
       if (userExist) {
         return {
-          code: 400,
-          success: false,
-          message: "user already exist",
-          user: null,
+          message: "user already exist!",
         };
       }
       console.log({ input });
@@ -66,14 +63,15 @@ export const resolvers = {
         .collection("Users")
         .findOne({ _id: result.insertedId });
 
+      // return {
+
+      //     user,
+      //     token: getToken(user),
+      //   },
+
       return {
-        code: 200,
-        success: true,
-        message: "user created!",
-        user: {
-          user,
-          token: getToken(user),
-        },
+        user,
+        token: getToken(user),
       };
     },
     signIn: async (_, args, context) => {
@@ -94,7 +92,7 @@ export const resolvers = {
       const isPasswordCorrect =
         user && bcrypt.compareSync(input.password, user.password);
       if (!isPasswordCorrect || !user) {
-        throw new AuthenticationError("Invalid credentials");
+        return { message: "invalid credentials!" };
       }
 
       // if (!isPasswordCorrect) {
@@ -106,13 +104,8 @@ export const resolvers = {
       //   };
       // }
       return {
-        code: 200,
-        success: true,
-        message: "user logged!",
-        user: {
-          user,
-          token: getToken(user),
-        },
+        user,
+        token: getToken(user),
       };
       // }
       // catch (error) {
@@ -330,14 +323,14 @@ export const resolvers = {
         };
       }
 
-      if (!content.length) {
-        return {
-          code: 400,
-          success: false,
-          message: "You can not create a empty to-do",
-          taskList: null,
-        };
-      }
+      // if (!content.length) {
+      //   return {
+      //     code: 400,
+      //     success: false,
+      //     message: "You can not create a empty to-do",
+      //     taskList: null,
+      //   };
+      // }
 
       const taskList = await db
         .collection("TaskList")
@@ -535,6 +528,13 @@ export const resolvers = {
         .collection("TaskList")
         .findOne({ _id: taskListId });
       return taskList;
+    },
+  },
+  AuthResult: {
+    __resolveType(obj) {
+      if (obj.user) return "AuthUser";
+      if (obj.message) return "AuthError";
+      return null;
     },
   },
 };
